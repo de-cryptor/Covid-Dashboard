@@ -1,0 +1,213 @@
+{% load static %}
+<!-- <link href="{% static "vendor/datatables/dataTables.bootstrap4.min.css" %} rel="stylesheet"> -->
+<div class="row">
+
+    <!-- Earnings (Monthly) Card Example -->
+    <div class="col-md-2 mb-4 align-items-center justify-content-between">
+    </div>
+
+    <div class="col-md-4 mb-4 align-items-center justify-content-between" style="margin: 10px;">
+        <button type="button" id="pincode" class="btn btn-primary">Find by Pincode</button>
+    </div>
+
+    <div class="col-md-4 mb-4 align-items-center justify-content-between" style="margin: 10px;">
+        <button type="button" id="state" class="btn btn-outline-primary">Find by State and City</button>
+    </div>
+
+    <div class="col-md-2 mb-4 align-items-center justify-content-between">
+    </div>
+</div>
+
+<div class="row PincodeForm">
+    <div class="col-md-2">
+        <span class="input-group-text" id="inputGroup-sizing-primary">Enter Pincode</span>
+    </div>
+    <div class="col-md-6">
+        <div class="input-group mb-3">
+            
+            <input type="text" id="pincodeValue" class="form-control pincodeValue" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+        </div>
+    </div>
+    <div class="col-md-2">
+        <button type="button" id="submitPincode" class="btn btn-primary">Submit</button>
+    </div>
+    
+</div>
+
+<div class="row StateForm" hidden="true">
+    <div class="col-md-2">
+        
+    </div>
+    <div class="col-md-6">
+        <div class="form-group mb-3">
+            <select class="selectState form-control">
+                <option selected>Select State</option>
+            </select>
+        </div>
+    </div>
+    
+</div>
+
+<div class="row DistrictForm" hidden="true">
+    <div class="col-md-2">
+        
+    </div>
+    <div class="col-md-6">
+        <div class="form-group mb-3">
+            <select class="selectDistrict form-control">
+                <option selected value="">Select City</option>
+            </select>
+        </div>
+    </div>
+    
+</div>
+
+<div class="row DistrictForm" hidden="true">
+    <div class="col-md-5">
+
+    </div>
+    <div class="col-md-5">
+        <button type="button" id="submitState" class="btn btn-primary">Submit</button>
+    </div>
+    
+</div>
+<div class="row VaccinationSlots">
+    <table id="table_id" class=" table">
+        <thead>
+            <tr>
+                <th>Centre</th>
+                <th>Availability</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Page level plugins -->
+<!-- <script src="{% static "vendor/datatables/jquery.dataTables.min.js" %}></script>
+<script src="{% static "vendor/datatables/dataTables.bootstrap4.min.js" %}></script> -->
+<!-- Page level custom scripts -->
+<script src="{% static "js/demo/datatables-demo.js" %}></script>
+<script src="{% static "vendor/jquery/jquery.js"  %}"></script>
+<script src="{% static "vendor/jquery/jquery.min.js"  %}"></script>
+<!-- <script src="{% static "vendor/jquery/jquery.slim.js"  %}"></script>
+<script src="{% static "vendor/jquery/jquery.slim.min.js"  %}"></script> -->
+<script>
+    $(document).ready(function() {
+        console.log("Jquery Loaded");
+        $("#pincode").on('click', function() {
+            console.log("pincode clicked");
+
+            // Button Classes
+            $(this).addClass('btn-primary');
+            $(this).removeClass('btn-outline-primary');
+            $('#state').addClass('btn-outline-primary');
+            $('#state').removeClass('btn-primary');
+
+            // Change Form
+            $('.PincodeForm').attr('hidden', false);
+            $('.StateForm').attr('hidden', true);
+            $('.DistrictForm').attr('hidden', true);
+
+        });
+        $("#state").on('click', function() {
+            console.log('state clicked');
+            $(this).addClass('btn-primary');
+            $(this).removeClass('btn-outline-primary');
+            $('#pincode').addClass('btn-outline-primary');
+            $('#pincode').removeClass('btn-primary');
+            
+            // Change Form
+            $('.PincodeForm').attr('hidden', true);
+            $('.StateForm').attr('hidden', false);
+            $('.DistrictForm').attr('hidden', false);
+
+            $.get("https://cdn-api.co-vin.in/api/v2/admin/location/states", function(data, status){
+                console.log(data);
+                $('.selectState').empty();
+                $('.selectState').append(new Option("Select State", ""));
+                $('.selectDistrict').empty();
+                $('.selectDistrict').append(new Option("Select City", ""));
+                for(var i=0 ; i<data.states.length; i++)
+                {
+                    $('.selectState').append(new Option(data.states[i].state_name, data.states[i].state_id));
+                }
+            });
+        });
+
+        $('.selectState').on('change', function() {
+            var state_id = $('.selectState').val();
+            $.get("https://cdn-api.co-vin.in/api/v2/admin/location/districts/"+state_id, function(data, status){
+                $('.selectDistrict').empty();
+                for(var i=0 ; i<data.districts.length; i++)
+                {
+                    $('.selectDistrict').append(new Option(data.districts[i].district_name, data.districts[i].district_id));
+                }
+            });
+        });
+
+        $('#submitPincode').on('click', function() {
+            var pincode = $('#pincodeValue').val();
+
+            $.get("https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode="+pincode+"&date=09-05-2021", function(data, status){
+                console.log(data);
+                tableBody = $("table tbody");
+                tableBody.empty();
+                for(var i=0 ; i<data.centers.length; i++)
+                {
+                    sessions = "";
+                    for(var j=0 ; j<data.centers[i].sessions.length;j++)
+                    {
+                        sessions += `<li>(${data.centers[i].sessions[j].date}) - ${data.centers[i].sessions[j].vaccine}(${data.centers[i].fee_type}) : ${data.centers[i].sessions[j].available_capacity} </li> `;
+                    }
+                    sessions = `<ul>${sessions}</ul>`;
+                    markup = `
+                        <tr>
+                            <td>${data.centers[i].name} (${data.centers[i].address})</td>
+                            <td>${sessions}</td>
+                        </tr>
+                    `;
+                    tableBody = $("table tbody");
+                    tableBody.append(markup);
+                }
+
+            });
+        });
+
+        $('#submitState').on('click', function() {
+            var district_id =  $('.selectDistrict').val();
+            console.log(district_id);
+            if(district_id == ""){
+                alert("Please select city");
+                return;
+            }
+            $.get("https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id="+district_id+"&date=09-05-2021", function(data, status){
+                console.log(data);
+                tableBody = $("table tbody");
+                tableBody.empty();
+                for(var i=0 ; i<data.centers.length; i++)
+                {
+                    sessions = "";
+                    for(var j=0 ; j<data.centers[i].sessions.length;j++)
+                    {
+                        sessions += `<li>(${data.centers[i].sessions[j].date}) - ${data.centers[i].sessions[j].vaccine}(${data.centers[i].fee_type}) : ${data.centers[i].sessions[j].available_capacity} </li> `;
+                    }
+                    sessions = `<ul>${sessions}</ul>`;
+                    markup = `
+                        <tr>
+                            <td>${data.centers[i].name} (${data.centers[i].address})</td>
+                            <td>${sessions}</td>
+                        </tr>
+                    `;
+                    tableBody = $("table tbody");
+                    tableBody.append(markup);
+                }
+
+            });
+        });
+    });
+</script>
