@@ -17,19 +17,19 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
-from app.views import Home,Vaccination,Oxygen,Plasma,Beds,Remdesivir,Donation,Guidelines,CaseTracker
+from app.views import Home,Vaccination,Oxygen,Plasma,Beds,Medicines,Donation,Guidelines,CaseTracker
 
 
 urlpatterns = [
     path('', Home.as_view(),name='home'),
     path('vaccination/', Home.as_view(),name='vaccination'),
-    path('oxygen/', Home.as_view(),name='oxygen'),
-    path('plasma/', Home.as_view(),name='plasma'),
-    path('beds/', Home.as_view(),name='beds'),
-    path('remdesivir/', Home.as_view(),name='remdesivir'),
-    path('donation/', Home.as_view(),name='donation'),
-    path('guidelines/', Home.as_view(),name='guidelines'),
-    path('case-tracker/', Home.as_view(),name='case-tracker'),
+    path('oxygen/', Oxygen.as_view(),name='oxygen'),
+    path('plasma/', Plasma.as_view(),name='plasma'),
+    path('beds/', Beds.as_view(),name='beds'),
+    path('medicines/', Medicines.as_view(),name='medicines'),
+    path('donation/', Donation.as_view(),name='donation'),
+    path('guidelines/', Guidelines.as_view(),name='guidelines'),
+    path('case-tracker/', CaseTracker.as_view(),name='case-tracker'),
     path('admin/', admin.site.urls),
     # path('dashboard/', include('app.urls')),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

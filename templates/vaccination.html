@@ -24,7 +24,6 @@
     </div>
     <div class="col-md-6">
         <div class="input-group mb-3">
-            
             <input type="text" id="pincodeValue" class="form-control pincodeValue" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
         </div>
     </div>
@@ -153,7 +152,7 @@
         $('#submitPincode').on('click', function() {
             var pincode = $('#pincodeValue').val();
 
-            $.get("https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode="+pincode+"&date=09-05-2021", function(data, status){
+            $.get("https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode="+pincode+"&date=22-05-2021", function(data, status){
                 console.log(data);
                 tableBody = $("table tbody");
                 tableBody.empty();
@@ -185,7 +184,7 @@
                 alert("Please select city");
                 return;
             }
-            $.get("https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id="+district_id+"&date=09-05-2021", function(data, status){
+            $.get("https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id="+district_id+"&date=22-05-2021", function(data, status){
                 console.log(data);
                 tableBody = $("table tbody");
                 tableBody.empty();
