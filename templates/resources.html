@@ -57,9 +57,11 @@
                         
                     </div>
                     <div class="text-center">
-                        <div class="spinner-grow text-primary" id="LoadingSpinner" role="status">
-                            <span class="sr-only">Loading...</span>
-                        </div>
+                        {% if data %}
+                            <div class="spinner-grow text-primary" id="LoadingSpinner" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        {% endif %}
                     </div>
                     <!-- Content Row -->
                     <div class="row">
@@ -67,6 +69,9 @@
                         </div>
                         <div class="col-md-8">
                             <div class="tweets" data-type="{{type}}">
+                                {% if  not data %}
+                                    <div> No Data Available for the Query at this moment</div>
+                                {% endif %}
                                 {% for tweet in data %}
                                     <blockquote class="twitter-tweet"><a href="https://twitter.com/x/status/{{tweet.id}}"></a></blockquote>
                                 {% endfor %}
